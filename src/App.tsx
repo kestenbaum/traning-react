@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {FC, useEffect, useId, useState} from 'react';
 import axios from "axios";
 
 interface Todo {
@@ -8,25 +8,37 @@ interface Todo {
   "completed": boolean
 }
 
-function App() {
-  const todo = 'https://jsonplaceholder.typicode.com/todos/'
+const App:FC = () => {
+  //id
+  const id = useId()
+
+  //http
+  const http:string = 'https://jsonplaceholder.typicode.com'
 
   //useState
   const [state] = useState<string>('')
   const [todos, setTodos] = useState<Todo[]>([])
+  const [valueInput, setValueInput] = useState<string>('')
 
   //useEffect
-  useEffect(() => {
-    axios.get(todo)
-        .then(response => setTodos(response.data))
+  useEffect( () => {
+     axios.get(`${http}/todos`).then(response => setTodos(response.data))
   }, [])
+
+  const getList = () => todos.map(element => {
+      return <li key={element.id}>{element.title}</li>
+  })
 
   return (
     <div className="App">
-      {state}
-      {todos.map(element => {
-        return <li key={element.id}>{element.title}</li>
-      })}
+      <label htmlFor={id}>Search:</label>
+      <input
+          id={id}
+          value={valueInput}
+          onChange={event => setValueInput(event.target.value)}
+      />
+        {state}
+        {getList()}
     </div>
   );
 }
