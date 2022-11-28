@@ -8,38 +8,45 @@ interface Todo {
   "completed": boolean
 }
 
-const App:FC = () => {
+export const App:FC = () => {
   //id
   const id = useId()
 
   //http
   const http:string = 'https://jsonplaceholder.typicode.com'
 
+  //limit
+  const limitItem = 10
+
   //useState
-  const [state] = useState<string>('')
   const [todos, setTodos] = useState<Todo[]>([])
+  const [allTodos, setAllTodos] = useState<Todo[]>([])
   const [valueInput, setValueInput] = useState<string>('')
   const [page, setPage] = useState<number>(1)
+  const [searchResult, setSearchResult] = useState<Todo[]>([])
 
-  //useEffect
-  useEffect( () => {
-     axios.get(`${http}/todos?_page=10&_limit=10`).then(response => setTodos(response.data))
-  }, [])
-
-  //create jsx element list
-  const getList = () => todos.map(element => {
-      return <li key={element.id}>{element.title}</li>
-  })
-
+  //update date
   useEffect(() => {
-      axios.get(`${http}/todos?_page=${page}&_limit=10`).then(response => setTodos(response.data))
+      axios.get(`${http}/todos`).then(response => setAllTodos(response.data))
+      axios.get(`${http}/todos?_page=${page}&_limit=${limitItem}`).then(response => setTodos(response.data))
   }, [page])
 
+  useEffect(() => {
+      const result  = allTodos.filter(element => element.title)
+      setSearchResult(result)
+      valueInput.length === 0 && setSearchResult([])
+  }, [allTodos, valueInput])
+
   //pagination
-  const pagination = Array.from(Array(10).keys()).map(element => {
-      //setPage(element + 1)
-      return <button onClick={() => setPage(element + 1)}>{element + 1}</button>
+  const pagination = Array.from(Array(allTodos.length / limitItem).keys()).map(element => {
+      return <button onClick={() => setPage(element + 1)} key={element}>{element + 1}</button>
   })
+
+    //create jsx element list
+    const getList = () => todos.map(element => {
+        return <li key={element.id}>{element.id} {element.title}</li>})
+
+
   return (
     <div className="App">
       <label htmlFor={id}>Search:</label>
@@ -48,12 +55,11 @@ const App:FC = () => {
           value={valueInput}
           onChange={event => setValueInput(event.target.value)}
       />
-        {state}
         <div>List: {todos.length}</div>
-        {getList()}
+        <>Page: {page}</>
+        {searchResult.length === 0 ? getList() : <>no</>}
         {pagination}
     </div>
   );
 }
 
-export default App;
