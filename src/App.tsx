@@ -57,7 +57,7 @@ export const App:FC = () => {
       />
         <div>List: {todos.length}</div>
         <>Page: {page}</>
-        {searchResult.length === 0 ? getList() : <>no</>}
+        {searchResult.length === 0 ? getList() : <>list </>}
         {pagination}
     </div>
   );
