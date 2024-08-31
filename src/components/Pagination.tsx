@@ -1,30 +1,19 @@
 import React, {FC} from 'react';
+import {calculatePages} from "../utils/calculatePages";
 
-interface IPagination {
-    postsPerPage: number,
-    totalPosts: number,
-    paginate: (number: any) => void
-}
+export const Pagination:FC<IPagination> = ({postsPerPage, totalPosts, paginate}) => {
+    const resultPages = calculatePages(totalPosts, postsPerPage);
 
-const Pagination:FC<IPagination> = ({postsPerPage, totalPosts, paginate}) => {
-    const pageNumbers:number[] = [];
-
-    for (let i = 1; i <=Math.ceil(totalPosts / postsPerPage); i++) {
-      pageNumbers.push(i);
-    }
+    const paginationList = resultPages.map(element => <a
+        onClick={() => paginate(element)}
+        key={element}
+        href={"!#"}>
+        {element}
+    </a>)
 
     return (
-        <div>
             <ul>
-                {pageNumbers.map(element => <a
-                    onClick={() => paginate(element)}
-                    key={element}
-                    href={"!#"}>
-                    {element}
-                </a>)}
+                {resultPages.length > 1 && paginationList}
             </ul>
-        </div>
     );
 };
-
-export default Pagination;
